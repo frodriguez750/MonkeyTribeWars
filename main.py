@@ -3,7 +3,8 @@ from player import Player
 from enemy import Enemy
 from structures import StructureManager
 from upgrades import UpgradeManager
-from map_window import MapWindow
+from map_window import MapWindow, LEFT_MARGIN, TILE_SIZE, BOTTOM_MARGIN
+
 
 # error here -> TypeError: _type_ must have storage info
 class GameWindow(MapWindow):

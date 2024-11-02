@@ -1,5 +1,7 @@
 import arcade
 
+from map_window import LEFT_MARGIN, TILE_SIZE, BOTTOM_MARGIN
+
 STRUCTURE_COSTS = {
     "hut": 10,
     "tower": 20
