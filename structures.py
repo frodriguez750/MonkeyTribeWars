@@ -1,5 +1,4 @@
 import arcade
-
 from map_window import LEFT_MARGIN, TILE_SIZE, BOTTOM_MARGIN
 
 STRUCTURE_COSTS = {
@@ -26,4 +25,6 @@ class StructureManager:
             color = arcade.color.BEIGE if structure_type == "hut" else arcade.color.DARK_GRAY
             x = LEFT_MARGIN + col * TILE_SIZE + TILE_SIZE / 2
             y = BOTTOM_MARGIN + row * TILE_SIZE + TILE_SIZE / 2
-            arcade.draw_rectangle_filled(x, y, TILE_SIZE, TILE_SIZE, color)
+            rect = arcade.types.XYWH(x, y, TILE_SIZE, TILE_SIZE)
+            arcade.draw_rect_filled(rect, color)
+            arcade.draw_rect_outline(rect, arcade.color.BLACK, border_width=1)

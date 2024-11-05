@@ -1,0 +1,2 @@
+arcade~=3.0.0.dev37
+numpy~=2.1.3
