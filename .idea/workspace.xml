@@ -4,17 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c94649a8-bec4-4c31-a8b6-333f4c0cedd5" name="Changes" comment="Update">
-      <change afterPath="$PROJECT_DIR$/assets/images/resources/hut.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/game_window.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/title.py" afterDir="false" />
+    <list default="true" id="c94649a8-bec4-4c31-a8b6-333f4c0cedd5" name="Changes" comment="Tried adding a title page. Still need to fix camera movement and include more functions.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/enemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/map_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_window.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/player.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/structures.py" beforeDir="false" afterPath="$PROJECT_DIR$/structures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/upgrades.py" beforeDir="false" afterPath="$PROJECT_DIR$/upgrades.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -207,10 +198,33 @@
       <option name="project" value="LOCAL" />
       <updated>1730789576050</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Tried adding a title page. Still need to fix camera movement and include more functions.">
+      <option name="closed" value="true" />
+      <created>1731052671540</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1731052671540</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="main" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
@@ -236,6 +250,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Everything I have so far" />
     <MESSAGE value="Update" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update" />
+    <MESSAGE value="Tried adding a title page. Still need to fix camera movement and include more functions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Tried adding a title page. Still need to fix camera movement and include more functions." />
   </component>
 </project>
