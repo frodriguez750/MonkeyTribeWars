@@ -99,7 +99,6 @@ class GameWindow(MapWindow):
         self.enemy_list.draw()
         self.resource_list.draw()
 
-
     def on_key_press(self, key, modifiers):
         """Handle player key press for movement and actions."""
         if key == arcade.key.UP and self.player.row < GRID_HEIGHT - 1:
@@ -112,17 +111,14 @@ class GameWindow(MapWindow):
             self.player.col += 1
 
         if key == arcade.key.P:  # Example key for placing a hut
-            placed, self.player.resources = self.structure_manager.place_structure(Hut, self.player.sprite.center_x,
-                                                                                   self.player.sprite.center_y,                                                                  self.player.resources)
-            if placed:
-                print("Hut placed!")
-            else:
-                print("Not enough resources!")
-
+            self.structure_manager.place_structure(Hut, self.player.sprite.center_x, self.player.sprite.center_y,
+                                                   self.player.resources)
 
         # Update the player's position on the screen
         x, y = pos_to_grid(self.player.row, self.player.col)
         self.player.update_position(x, y)
+
+        self.check_resource()
 
         # Center the camera on the player
         self.scroll_to_player()
@@ -131,9 +127,7 @@ class GameWindow(MapWindow):
         """Check if the player is on a resource cell and collects the resource."""
         for resource in self.resource_list:
             if arcade.check_for_collision(self.player.sprite, resource):
-                self.player.resources += 1
-                resource.collected()
-                self.resource_list.remove(resource)
+                self.player.resources[resource.collected().name] += 5
                 break
 
     def generate_resources(self, quantity):

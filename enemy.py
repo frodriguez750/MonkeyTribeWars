@@ -52,4 +52,5 @@ class Enemy:
             self.sprite.center_x += (target_position[1] - self.sprite.center_x) * 0.1
             self.sprite.center_y += (target_position[0] - self.sprite.center_y) * 0.1
         else:
-            print("No resources found. Enemy is staying put.")
+            # print("No resources found. Enemy is staying put.")
+            return
