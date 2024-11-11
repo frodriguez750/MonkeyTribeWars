@@ -5,9 +5,22 @@ from map_window import pos_to_grid
 
 
 class ResourceType(Enum):
-    WOOD = "tree-log-small"  # assets from https://kenney.nl/
-    STONE = "resource-stone"
-    FOOD = "burger"
+    WOOD = "WOOD"  # assets from https://kenney.nl/
+    STONE = "STONE"
+    FOOD = "FOOD"
+
+    def to_sprite_str(self):
+        '''Convert resource type to sprite filename.'''
+        match self.name:
+            case "WOOD":
+                return "tree-log-small"  # assets from https://kenney.nl/
+            case "STONE":
+                return "resource-stone"
+            case "FOOD":
+                return "burger"
+            case _:
+                print("Unknown resource type %s.", self.name)
+                return
 
 
 class Resource(arcade.Sprite):
@@ -23,7 +36,7 @@ class Resource(arcade.Sprite):
         else:
             self.type = type
 
-        self.texture = arcade.load_texture(f"assets/images/resources/{self.type.value}.png")
+        self.texture = arcade.load_texture(f"assets/images/resources/{self.type.to_sprite_str()}.png")
         self.sprite = arcade.Sprite(self.texture)
 
     def collected(self):

@@ -2,9 +2,10 @@ import arcade
 from map_window import LEFT_MARGIN, TILE_SIZE, BOTTOM_MARGIN
 
 STRUCTURE_COSTS = {
-    "hut": 10,
-    "tower": 20
+    "hut": {"WOOD": 10},
+    "tower": {"WOOD": 10, "STONE": 10}
 }
+
 
 class StructureManager:
     def __init__(self):
@@ -13,11 +14,28 @@ class StructureManager:
     def place_structure(self, structure_type, row, col, resources):
         """Place a structure on the grid if resources are sufficient."""
         cost = STRUCTURE_COSTS.get(structure_type, 0)
-        if resources >= cost:
-            resources -= cost
-            self.structures[(row, col)] = structure_type
-            return True
-        return False
+        required_str = []
+        available_str = []
+
+        for res, amt in cost.items():
+            if res in resources:
+                # If any resource is insufficient, print error message
+                if resources[res] < amt:
+                    for req, val in cost.items():
+                        required_str.append(req + " " + str(val))
+                        available_str.append(req + " " + str(resources.get(req, 0)))
+
+                    print(f"Insufficient resources for {structure_type}. "
+                          f"Available: {', '.join(available_str)}. Needed: {', '.join(required_str)}")
+
+                    return False
+
+        for res, amt in cost.items():
+            resources[res] -= amt
+
+        self.structures[(row, col)] = structure_type
+
+        return True
 
     def draw_structures(self):
         """Draw structures on the grid based on their type."""

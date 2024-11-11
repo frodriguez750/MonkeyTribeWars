@@ -48,8 +48,7 @@ class GameWindow(MapWindow):
         """Check if the player is on a resource cell and collects the resource."""
         for resource in self.resource_list:
             if arcade.check_for_collision(self.player.sprite, resource):
-                self.player.resources += 1
-                resource.collected()
+                self.player.resources[resource.collected().name] += 5
                 break
 
     def generate_resources(self, quantity):
