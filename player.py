@@ -15,10 +15,6 @@ class Player:
         self.row = 5
         self.col = 5
 
-    #def draw(self):
-     #   """Draw the player sprite."""
-      #  self.sprite.draw()
-
     def update_position(self, x, y):
         """Update player's pixel position on the grid."""
         self.sprite.center_x = x
@@ -27,9 +23,9 @@ class Player:
     def handle_key_press(self, key):
         """Move the player or perform actions based on key press."""
         if key == arcade.key.UP:
-            self.row = max(0, self.row - 1)
+            self.row = max(0, self.row + 1)
         elif key == arcade.key.DOWN:
-            self.row = min(9, self.row + 1)
+            self.row = min(9, self.row - 1)
         elif key == arcade.key.LEFT:
             self.col = max(0, self.col - 1)
         elif key == arcade.key.RIGHT:

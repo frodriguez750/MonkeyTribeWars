@@ -7,13 +7,33 @@ STRUCTURE_COSTS = {
 }
 
 
+class Structure(arcade.Sprite):
+    def __init__(self, image_path, start_x, start_y, cost, health, scale):
+        super().__init__(image_path, center_x=start_x, center_y=start_y, scale=scale)
+        self.cost = cost
+        self.health = health
+        self.texture = arcade.load_texture(image_path)
+        self.sprite = arcade.Sprite(self.texture)
+
+
+class Hut(Structure):
+    def __init__(self, start_x, start_y):
+        super().__init__('assets/images/resources/hut.png', start_x, start_y, cost={"WOOD": 50}, health=100, scale=0.25)
+
+
+class Tower(Structure):
+    def __init__(self, start_x, start_y):
+        super().__init__('assets/images/resources/tower.png', start_x, start_y, cost={"WOOD": 75, "STONE": 25}, health=200, scale=0.25)
+
+
 class StructureManager:
     def __init__(self):
-        self.structures = {}
+        self.structures = arcade.SpriteList()
 
-    def place_structure(self, structure_type, row, col, resources):
+    def place_structure(self, structure_type, x, y, resources):
         """Place a structure on the grid if resources are sufficient."""
-        cost = STRUCTURE_COSTS.get(structure_type, 0)
+        structure = structure_type(x, y)
+        cost = structure.cost
         required_str = []
         available_str = []
 
@@ -25,7 +45,7 @@ class StructureManager:
                         required_str.append(req + " " + str(val))
                         available_str.append(req + " " + str(resources.get(req, 0)))
 
-                    print(f"Insufficient resources for {structure_type}. "
+                    print(f"Insufficient resources for {structure_type.__name__}. "
                           f"Available: {', '.join(available_str)}. Needed: {', '.join(required_str)}")
 
                     return False
@@ -33,16 +53,9 @@ class StructureManager:
         for res, amt in cost.items():
             resources[res] -= amt
 
-        self.structures[(row, col)] = structure_type
-
+        self.structures.append(structure)
+        print(f"{structure_type.__name__} successfully placed.")
         return True
 
     def draw_structures(self):
-        """Draw structures on the grid based on their type."""
-        for (row, col), structure_type in self.structures.items():
-            color = arcade.color.BEIGE if structure_type == "hut" else arcade.color.DARK_GRAY
-            x = LEFT_MARGIN + col * TILE_SIZE + TILE_SIZE / 2
-            y = BOTTOM_MARGIN + row * TILE_SIZE + TILE_SIZE / 2
-            rect = arcade.types.XYWH(x, y, TILE_SIZE, TILE_SIZE)
-            arcade.draw_rect_filled(rect, color)
-            arcade.draw_rect_outline(rect, arcade.color.BLACK, border_width=1)
+        self.structures.draw()
