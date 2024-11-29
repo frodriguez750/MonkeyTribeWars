@@ -18,6 +18,7 @@ class ResourceType(Enum):
     WOOD = "WOOD"
     STONE = "STONE"
     FOOD = "FOOD"
+    DIAMOND = "DIAMOND"
 
     def to_sprite_str(self):
         """
@@ -32,6 +33,8 @@ class ResourceType(Enum):
                 return "resource-stone"
             case "FOOD":
                 return "burger"
+            case "DIAMOND":
+                return "gemBlue"
             case _:
                 print("Unknown resource type %s.", self.name)
                 return None
@@ -61,8 +64,13 @@ class Resource(arcade.Sprite):
         self.center_x, self.center_y = pos_to_grid(self.row, self.col, TILE_SIZE)
 
         # Load the appropriate texture for the resource
-        self.texture = arcade.load_texture(
-            f"assets/images/resources/{self.type.to_sprite_str()}.png")
+        if self.type is ResourceType.DIAMOND:
+            self.scale = 0.5
+            self.texture = arcade.load_texture(
+                f":resources:images/items/{self.type.to_sprite_str()}.png")
+        else:
+            self.texture = arcade.load_texture(
+                f"assets/images/resources/{self.type.to_sprite_str()}.png")
 
     def collected(self):
         """
@@ -83,39 +91,14 @@ class ResourceManager:
         """Initialize the ResourceManager with a sprite list to track resources."""
         self.resource_sprite_list = arcade.SpriteList()
 
-    def spawn_resource(self, is_diamond=False):
+    def spawn_resource(self):
         """
-        Spawn a single resource or diamond at a random grid location.
-        Args:
-            is_diamond (bool): If True, spawns a diamond instead of a standard resource.
+        Spawn a single resource at a random grid location.
         """
-        if is_diamond:
-            # Diamonds are a special case, not tied to ResourceType
-            row = random.randint(0, 49)
-            col = random.randint(0, 49)
-            diamond = GridSprite(":resources:images/items/gemBlue.png", 0.5)
-            diamond.row = row
-            diamond.col = col
-            diamond.center_x, diamond.center_y = pos_to_grid(row, col, TILE_SIZE)
-            self.resource_sprite_list.append(diamond)
-        else:
-            # Normal resource spawning
-            resource_type = random.choice(list(ResourceType))
-            row = random.randint(0, 49)
-            col = random.randint(0, 49)
-            resource = Resource(type=resource_type, row=row, col=col)
-            self.resource_sprite_list.append(resource)
-
-    def spawn_initial_resources(self, count):
-        """
-        Spawn a specified number of resources and diamonds on the grid.
-        Args:
-                count (int): The total number of resources to spawn.
-        """
-        for _ in range(count):
-            self.spawn_resource()  # Spawn normal resources
-        for _ in range(count // 2):  # Spawn fewer diamonds
-            self.spawn_resource(is_diamond=True)
+        # Normal resource spawning
+        resource_type = random.choice(list(ResourceType))
+        resource = Resource(type=resource_type)
+        self.resource_sprite_list.append(resource)
 
     def check_resource_collection(self, player):
         """
