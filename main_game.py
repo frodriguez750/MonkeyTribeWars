@@ -20,7 +20,7 @@ from defeat_screen import DefeatScreen
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Monkey Tribe Wars"
-RESOURCE_COUNT = 20
+RESOURCE_COUNT = 100
 SPRITE_SCALING = 0.5
 PLAYER_HEALTH = 100
 ENEMY_DAMAGE = 10
@@ -67,7 +67,6 @@ class GridGame(arcade.View):
 
         # Resource manager
         self.resource_manager = ResourceManager()
-        self.resource_manager.spawn_initial_resources(RESOURCE_COUNT)
         self.structure_manager = BuildingManager()
         # Initialize inventory for resources
         self.inventory = {"WOOD": 100, "STONE": 100, "FOOD": 100}  # Example starting resources
@@ -94,6 +93,8 @@ class GridGame(arcade.View):
         self.event_cooldown = 30 # Cooldown time between events in secs
         self.time_since_last_event = 0 # Track time since last event
 
+        self.scroll_to_player()
+
     def spawn_resources(self, count):
         """Spawn resources randomly on the grid."""
         for _ in range(count):
@@ -103,13 +104,10 @@ class GridGame(arcade.View):
             resource = Resource(type=rand_type)
             self.resource_manager.resource_sprite_list.append(resource)
 
-            # Spawn diamonds (currency resources)
-            for _ in range(count // 3):  # Fewer diamonds compared to other resources
-                diamond = GridSprite(":resources:images/items/gemBlue.png", SPRITE_SCALING)
-                diamond.row = random.randint(0, GRID_HEIGHT - 1)
-                diamond.col = random.randint(0, GRID_WIDTH - 1)
-                diamond.center_x, diamond.center_y = pos_to_grid(diamond.row, diamond.col, TILE_SIZE)
-                self.diamond_sprite_list.append(diamond)
+        # Spawn diamonds (currency resources)
+        for _ in range(count // 3):  # Fewer diamonds compared to other resources
+            diamond = Resource(type=ResourceType.DIAMOND)
+            self.diamond_sprite_list.append(diamond)
 
     def spawn_enemies(self, count):
         """Spawn enemies randomly on the grid."""
@@ -187,7 +185,11 @@ class GridGame(arcade.View):
 
     def on_update(self, delta_time):
         """Update game logic."""
-        self.scroll_to_player()
+        if self.player_health <= 0:
+            print("Game Over!")
+            defeat_view = DefeatScreen()
+            self.window.show_view(defeat_view)  # Shows defeat screen
+            return
 
         # Apply active upgrades
         self.upgrade_manager.apply_upgrades()
@@ -205,12 +207,6 @@ class GridGame(arcade.View):
                     # Check collision with player
                     if arcade.check_for_collision(enemy, self.player):
                         self.player_health -= ENEMY_DAMAGE
-                        if self.player_health <= 0:
-                            print("Game Over!")
-                            from defeat_screen import DefeatScreen
-                            defeat_view = DefeatScreen()
-                            self.window.show_view(defeat_view) # Shows defeat screen
-                            return
 
                         # Enemy collects resources (but not FOOD or DIAMOND)
                         resources_collected = arcade.check_for_collision_with_list(
@@ -326,6 +322,8 @@ class GridGame(arcade.View):
         elif key == arcade.key.SPACE:
             self.attack_enemies()
 
+        self.scroll_to_player()  # Call scroll_to_player here to avoid jittery screen
+
         # Build structures
         if key == arcade.key.H:  # Press 'H' to build a hut
             grid_x = int(self.player.center_x // TILE_SIZE)
@@ -417,7 +415,7 @@ class GridGame(arcade.View):
                     print(f"A structure was destroyed by the meteor shower!")
 
             # Damage players and enemies in random spots
-            for sprite_list in [self.player_sprite_list, self.enemy_sprite_list, self.ai_players]:
+            for sprite_list in [self.player_sprite_list, self.enemy_sprite_list]:
                 for sprite in sprite_list:
                     if random.random() < 0.1:  # 10% chance to be hit
                         sprite.health -= 10
@@ -470,10 +468,7 @@ class GridGame(arcade.View):
         else:
             # Spawn extra diamonds randomly on the map
             for _ in range(5):  # Spawn 5 diamonds per tick
-                diamond = GridSprite(":resources:images/items/gemBlue.png", SPRITE_SCALING)
-                diamond.row = random.randint(0, GRID_HEIGHT - 1)
-                diamond.col = random.randint(0, GRID_WIDTH - 1)
-                diamond.center_x, diamond.center_y = pos_to_grid(diamond.row, diamond.col, TILE_SIZE)
+                diamond = Resource(ResourceType.DIAMOND)
                 self.diamond_sprite_list.append(diamond)
                 print(f"Diamond spawned at ({diamond.row}, {diamond.col})")
 
