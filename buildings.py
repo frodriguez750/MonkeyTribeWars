@@ -172,8 +172,8 @@ class BuildingManager:
         Place a structure on the grid if resources are sufficient.
         Args:
             structure_type (class): The type of structure to place (e.g., Hut, Tower).
-            x (int): X-coordinate in grid units.
-            y (int): Y-coordinate in grid units.
+            x (int): X-coordinate in pixels.
+            y (int): Y-coordinate in pixels.
             resources (dict): The player's available resources.
             team (str): The team that the structure belongs to ("player" or "enemy").
         Returns:
@@ -238,4 +238,3 @@ class BuildingManager:
                     structure.attack_nearby_entities(player_list, BUILDING_ATTACK_RANGE, BUILDING_ATTACK_DAMAGE)
                     structure.attack_nearby_entities(ai_list, BUILDING_ATTACK_RANGE, BUILDING_ATTACK_DAMAGE)
                 structure.attack_timer = 0
-
