@@ -23,10 +23,12 @@ SCREEN_TITLE = "Monkey Tribe Wars"
 RESOURCE_COUNT = 100
 SPRITE_SCALING = 0.5
 PLAYER_HEALTH = 100
+PLAYER_INV = 1  # Duration player is invincible for after taking damage
 ENEMY_DAMAGE = 10
 ENEMY_MOVE_DELAY = 0.5  # Delay in seconds between enemy moves
 BANANA_SPEED = 5
 BANANA_LIFE = 1
+FLASH_DURATION = 0.25
 
 
 class GridGame(arcade.View):
@@ -60,14 +62,18 @@ class GridGame(arcade.View):
 
         # Player setup
         self.player = GridSprite(
-            ":resources:images/animated_characters/male_adventurer/maleAdventurer_idle.png",
-            SPRITE_SCALING,
+            "assets/images/characters/monkey.png",  # https://opengameart.org/content/cartoon-animals
+            SPRITE_SCALING / 3,
         )
         self.player.row = GRID_HEIGHT // 2
         self.player.col = GRID_WIDTH // 2
         self.player.center_x, self.player.center_y = pos_to_grid(self.player.row, self.player.col, TILE_SIZE)
         self.player_sprite_list.append(self.player)
         self.player.direction = (1, 0)
+        self.player.itime = 0
+        self.player.hit = False
+        self.flash_duration = 0
+        self.flash_color = (255, 0, 0, 32)
 
         # Resource manager
         self.resource_manager = ResourceManager()
@@ -117,7 +123,8 @@ class GridGame(arcade.View):
         for _ in range(count):
             row = random.randint(0, GRID_HEIGHT - 1)
             col = random.randint(0, GRID_WIDTH - 1)
-            enemy = Enemy(":resources:images/animated_characters/zombie/zombie_idle.png", SPRITE_SCALING)
+            enemy = Enemy("assets/images/characters/monkey.png", SPRITE_SCALING / 3)
+            enemy.color = arcade.color.RED
             enemy.row = row
             enemy.col = col
             enemy.center_x, enemy.center_y = pos_to_grid(row, col, TILE_SIZE)
@@ -155,6 +162,9 @@ class GridGame(arcade.View):
             arcade.color.WHITE,
             16,
         )
+
+        if self.flash_duration > 0:
+            arcade.draw_lbwh_rectangle_filled(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.flash_color)
 
     @staticmethod
     def move_sprite(sprite, dx, dy):
@@ -194,6 +204,9 @@ class GridGame(arcade.View):
             defeat_view = DefeatScreen()
             self.window.show_view(defeat_view)  # Shows defeat screen
             return
+        
+        if self.flash_duration > 0:
+            self.flash_duration -= delta_time
 
         # Apply active upgrades
         self.upgrade_manager.apply_upgrades()
@@ -228,8 +241,6 @@ class GridGame(arcade.View):
 
                     # Check collision with player
                     if arcade.check_for_collision(enemy, self.player):
-                        self.player_health -= ENEMY_DAMAGE
-
                         # Enemy collects resources (but not FOOD or DIAMOND)
                         resources_collected = arcade.check_for_collision_with_list(
                             enemy, self.resource_manager.resource_sprite_list
@@ -245,6 +256,17 @@ class GridGame(arcade.View):
                             x, y = enemy.row, enemy.col
                             if self.structure_manager.place_structure(Hut, int(x), int(y), enemy.inventory, team="enemy"):
                                 print(f"Enemy built a Hut at ({x}, {y}).")
+        
+        if self.player.itime > PLAYER_INV:
+            self.player.hit = False
+            self.player.itime = 0
+
+        if not self.player.hit:
+            for enemy in self.enemy_sprite_list:
+                if arcade.check_for_collision(enemy, self.player):
+                    self.player_take_damage(ENEMY_DAMAGE)
+        else:
+            self.player.itime += delta_time
 
         # Player collects diamonds
         diamonds_collected = arcade.check_for_collision_with_list(self.player, self.diamond_sprite_list)
@@ -258,7 +280,7 @@ class GridGame(arcade.View):
         for collected_type in collected_resources:
             if collected_type == ResourceType.FOOD:
                 if self.player_health < PLAYER_HEALTH:
-                    self.player_health = min(PLAYER_HEALTH, self.player_health + 10)  # Heal player
+                    self.player_heal(10)  # Heal player
                     self.inventory["FOOD"] += 1  # Update FOOD inventory
                 else:
                     print("Health is full! Food not collected.")
@@ -421,6 +443,17 @@ class GridGame(arcade.View):
         banana.life = 0
         self.banana_sprite_list.append(banana)
 
+    def player_take_damage(self, damage):
+        self.player_health -= damage
+        self.flash_duration = FLASH_DURATION
+        self.player.hit = True
+        self.flash_color = (255, 0, 0, 32)
+    
+    def player_heal(self, health):
+        self.player_health = max(self.player_health + health, PLAYER_HEALTH)
+        self.flash_duration = FLASH_DURATION
+        self.flash_color = (0, 255, 0, 32)
+
     def create_ai_player(self):
         """Create a new AI player if the player has enough points."""
         if self.score >= self.ai_player_cost:
@@ -458,7 +491,7 @@ class GridGame(arcade.View):
                 for sprite in sprite_list:
                     if random.random() < 0.1:  # 10% chance to be hit
                         if type(sprite) is GridSprite:
-                            self.player_health -= 10
+                            self.player_take_damage(10)
                             print("Player was hit by a meteor!")
                         else:
                             sprite.health -= 10
