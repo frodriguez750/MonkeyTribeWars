@@ -25,6 +25,8 @@ SPRITE_SCALING = 0.5
 PLAYER_HEALTH = 100
 ENEMY_DAMAGE = 10
 ENEMY_MOVE_DELAY = 0.5  # Delay in seconds between enemy moves
+BANANA_SPEED = 5
+BANANA_LIFE = 1
 
 
 class GridGame(arcade.View):
@@ -51,6 +53,7 @@ class GridGame(arcade.View):
         self.enemy_sprite_list = arcade.SpriteList()
         self.resource_sprite_list = arcade.SpriteList()
         self.diamond_sprite_list = arcade.SpriteList()
+        self.banana_sprite_list = arcade.SpriteList()
 
         # AI players
         self.ai_players = arcade.SpriteList()
@@ -64,12 +67,13 @@ class GridGame(arcade.View):
         self.player.col = GRID_WIDTH // 2
         self.player.center_x, self.player.center_y = pos_to_grid(self.player.row, self.player.col, TILE_SIZE)
         self.player_sprite_list.append(self.player)
+        self.player.direction = (1, 0)
 
         # Resource manager
         self.resource_manager = ResourceManager()
         self.structure_manager = BuildingManager()
         # Initialize inventory for resources
-        self.inventory = {"WOOD": 5, "STONE": 0, "FOOD": 0}
+        self.inventory = {"WOOD": 0, "STONE": 0, "FOOD": 0}
         # self.structure_manager.place_structure(Hut, 200, 200, self.inventory, team="player")
         self.upgrade_manager = UpgradeManager(self.player, self.ai_players, self.structure_manager)
 
@@ -135,6 +139,7 @@ class GridGame(arcade.View):
         self.diamond_sprite_list.draw()
         self.player_sprite_list.draw()
         self.enemy_sprite_list.draw()
+        self.banana_sprite_list.draw()
         self.ai_players.draw()
         self.resource_manager.resource_sprite_list.draw()
         self.structure_manager.draw_structures()
@@ -192,6 +197,24 @@ class GridGame(arcade.View):
 
         # Apply active upgrades
         self.upgrade_manager.apply_upgrades()
+
+        # Update banana projectiles
+        self.banana_sprite_list.update()
+        for banana in self.banana_sprite_list:
+            banana.angle += 10
+            banana.life += delta_time
+            enemies_hit = arcade.check_for_collision_with_list(banana, self.enemy_sprite_list)
+            for enemy in enemies_hit:
+                enemy.remove_from_sprite_lists()
+                banana.remove_from_sprite_lists()
+                self.score += 5  # Award points for defeating an enemy
+                self.enemies_destroyed += 1
+                print(f"Enemy defeated! Score: {self.score}")
+                # Respawn enemies
+                self.spawn_enemies(1)
+
+            if banana.life > BANANA_LIFE:
+                banana.remove_from_sprite_lists()
 
         # Update enemy movement timer
         self.enemy_move_timer += delta_time
@@ -312,14 +335,19 @@ class GridGame(arcade.View):
         """Handle key press for player movement."""
         if key == arcade.key.UP:
             self.move_sprite(self.player, 0, 1)
+            self.player.direction = (0, 1)
         elif key == arcade.key.DOWN:
             self.move_sprite(self.player, 0, -1)
+            self.player.direction = (0, -1)
         elif key == arcade.key.LEFT:
             self.move_sprite(self.player, -1, 0)
+            self.player.direction = (-1, 0)
         elif key == arcade.key.RIGHT:
             self.move_sprite(self.player, 1, 0)
+            self.player.direction = (1, 0)
         elif key == arcade.key.SPACE:
-            self.attack_enemies()
+            # self.attack_enemies()
+            self.throw_banana()
 
         self.scroll_to_player()  # Call scroll_to_player here to avoid jittery screen
 
@@ -382,6 +410,16 @@ class GridGame(arcade.View):
                 print(f"Enemy defeated! Score: {self.score}")
                 # Respawn enemies
                 self.spawn_enemies(1)
+    
+    def throw_banana(self):
+        """Throw a banana in front of the player."""
+        banana = arcade.Sprite()
+        banana.texture = arcade.load_texture("assets/images/projectiles/banana.png")
+        banana.center_x, banana.center_y = self.player.center_x, self.player.center_y
+        banana.direction = self.player.direction
+        banana.change_x, banana.change_y = banana.direction[0] * BANANA_SPEED, banana.direction[1] * BANANA_SPEED
+        banana.life = 0
+        self.banana_sprite_list.append(banana)
 
     def create_ai_player(self):
         """Create a new AI player if the player has enough points."""
