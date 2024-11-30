@@ -69,14 +69,13 @@ class GridGame(arcade.View):
         self.resource_manager = ResourceManager()
         self.structure_manager = BuildingManager()
         # Initialize inventory for resources
-        self.inventory = {"WOOD": 100, "STONE": 100, "FOOD": 100}  # Example starting resources
-        self.structure_manager.place_structure(Hut, 200, 200, self.inventory, team="player")
+        self.inventory = {"WOOD": 5, "STONE": 0, "FOOD": 0}
+        # self.structure_manager.place_structure(Hut, 200, 200, self.inventory, team="player")
         self.upgrade_manager = UpgradeManager(self.player, self.ai_players, self.structure_manager)
 
         # Initialize resources and enemies
         self.spawn_resources(RESOURCE_COUNT)
         self.spawn_enemies(10)
-        self.inventory = {"WOOD": 0, "STONE": 0, "FOOD": 0}
 
         # Game variables
         self.player_health = PLAYER_HEALTH
@@ -326,16 +325,18 @@ class GridGame(arcade.View):
 
         # Build structures
         if key == arcade.key.H:  # Press 'H' to build a hut
-            grid_x = int(self.player.center_x // TILE_SIZE)
-            grid_y = int(self.player.center_y // TILE_SIZE)
-            success = self.structure_manager.place_structure(Hut, grid_x, grid_y, self.inventory, team="player")
+            pos_x = self.player.center_x
+            pos_y = self.player.center_y
+            success = self.structure_manager.place_structure(Hut, pos_x, pos_y, self.inventory, team="player")
+            grid_x, grid_y = int(pos_x // TILE_SIZE), int(pos_y // TILE_SIZE)
             if success:
                 print(f"Hut built at ({grid_x}, {grid_y}).")
 
         if key == arcade.key.T:  # Press 'T' to build a tower
-            grid_x = int(self.player.center_x // TILE_SIZE)
-            grid_y = int(self.player.center_y // TILE_SIZE)
-            success = self.structure_manager.place_structure(Tower, grid_x, grid_y, self.inventory, team="player")
+            pos_x = self.player.center_x
+            pos_y = self.player.center_y
+            success = self.structure_manager.place_structure(Tower, pos_x, pos_y, self.inventory, team="player")
+            grid_x, grid_y = int(pos_x // TILE_SIZE), int(pos_y // TILE_SIZE)
             if success:
                 print(f"Tower built at ({grid_x}, {grid_y}).")
 
@@ -418,11 +419,15 @@ class GridGame(arcade.View):
             for sprite_list in [self.player_sprite_list, self.enemy_sprite_list]:
                 for sprite in sprite_list:
                     if random.random() < 0.1:  # 10% chance to be hit
-                        sprite.health -= 10
-                        print(f"{sprite.__class__.__name__} was hit by a meteor!")
-                        if sprite.health <= 0:
-                            sprite.remove_from_sprite_lists()
-                            print(f"{sprite.__class__.__name__} was destroyed by a meteor!")
+                        if type(sprite) is GridSprite:
+                            self.player_health -= 10
+                            print("Player was hit by a meteor!")
+                        else:
+                            sprite.health -= 10
+                            print(f"{sprite.__class__.__name__} was hit by a meteor!")
+                            if sprite.health <= 0:
+                                sprite.remove_from_sprite_lists()
+                                print(f"{sprite.__class__.__name__} was destroyed by a meteor!")
 
     def apply_monkey_raid_effects(self):
         """
