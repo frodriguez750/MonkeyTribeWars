@@ -9,16 +9,15 @@ import arcade
 import random
 from resources import ResourceType, ResourceManager, Resource
 from game_utils import GridSprite, pos_to_grid
-from game_constants import TILE_SIZE, GRID_WIDTH, GRID_HEIGHT
+from game_constants import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, GRID_WIDTH, GRID_HEIGHT
 from buildings import BuildingManager, Hut, Tower
 from title_screen import TitleScreen
+from settings import SettingsMenu
 from upgrades import UpgradeManager
 from enemies import Enemy
 from music import MusicManager
 from defeat_screen import DefeatScreen
 # Constants
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Monkey Tribe Wars"
 RESOURCE_COUNT = 100
 SPRITE_SCALING = 0.5
@@ -37,12 +36,12 @@ class GridGame(arcade.View):
         Handles player and AI behaviors, resource collection, building placement, enemy interactions,
         and game events.
         """
-    def __init__(self):
+    def __init__(self, music_manager):
         """Initialize the game window and set up game variables and systems."""
         super().__init__()
 
         # Initialize music manager
-        self.music_manager = MusicManager()
+        self.music_manager = music_manager
         self.music_manager.load_background_music("assets/audio/background_music.wav")
         self.music_manager.play_background_music()
 
@@ -56,6 +55,7 @@ class GridGame(arcade.View):
         self.resource_sprite_list = arcade.SpriteList()
         self.diamond_sprite_list = arcade.SpriteList()
         self.banana_sprite_list = arcade.SpriteList()
+        self.ui_sprite_list = arcade.SpriteList()
 
         # AI players
         self.ai_players = arcade.SpriteList()
@@ -74,6 +74,11 @@ class GridGame(arcade.View):
         self.player.hit = False
         self.flash_duration = 0
         self.flash_color = (255, 0, 0, 32)
+
+        # UI elements
+        settings_button = arcade.Sprite(":resources:onscreen_controls/shaded_light/gear.png",
+                                        center_x=SCREEN_WIDTH-30, center_y=SCREEN_HEIGHT-30)
+        self.ui_sprite_list.append(settings_button)
 
         # Resource manager
         self.resource_manager = ResourceManager()
@@ -162,6 +167,8 @@ class GridGame(arcade.View):
             arcade.color.WHITE,
             16,
         )
+
+        self.ui_sprite_list.draw()
 
         if self.flash_duration > 0:
             arcade.draw_lbwh_rectangle_filled(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.flash_color)
@@ -422,6 +429,12 @@ class GridGame(arcade.View):
             else:
                 print("Not enough diamonds for resource efficiency upgrade.")
 
+    def on_mouse_press(self, x, y, button, modifiers):
+        for ui in self.ui_sprite_list:
+            if ui.collides_with_point((x, y)):
+                settings_view = SettingsMenu(self, self.music_manager)  # Pass this view as the parent
+                self.window.show_view(settings_view)
+
     def attack_enemies(self):
         """Attack enemies adjacent to the player and destroy them."""
         for enemy in self.enemy_sprite_list:
@@ -562,7 +575,7 @@ class GridGame(arcade.View):
 
 if __name__ == "__main__":
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    title_screen = TitleScreen()
+    title_screen = TitleScreen(MusicManager())
     window.show_view(title_screen)  # Start with the title screen
     arcade.run()
 
