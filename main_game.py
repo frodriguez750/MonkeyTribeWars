@@ -472,8 +472,8 @@ class GridGame(arcade.View):
         if self.score >= self.ai_player_cost:
             self.score -= self.ai_player_cost  # Deduct points for the new AI player
             new_ai = GridSprite(
-                ":resources:images/animated_characters/male_adventurer/maleAdventurer_idle.png",  # Replace with AI player sprite image path
-                SPRITE_SCALING
+                "assets/images/characters/monkey.png",  # Replace with AI player sprite image path
+                scaling =0.15
             )
             # Assign AI-specific attributes, such as movement behavior
             new_ai.row = int(new_ai.center_y // TILE_SIZE)

@@ -4,24 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c94649a8-bec4-4c31-a8b6-333f4c0cedd5" name="Changes" comment="Tried adding a title page. Still need to fix camera movement and include more functions.">
-      <change afterPath="$PROJECT_DIR$/.idea/MonkeyTribeWars.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/buildings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/defeat_screen.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/enemies.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/music.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/title_screen.py" afterDir="false" />
+    <list default="true" id="c94649a8-bec4-4c31-a8b6-333f4c0cedd5" name="Changes" comment="Updated everything and kept your code. main_game is not fully commented.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/enemy.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_window.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/map_window.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/player.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/structures.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/title.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/upgrades.py" beforeDir="false" afterPath="$PROJECT_DIR$/upgrades.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/resources/hut.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/resources/hut.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/tilesets/tf_jungle_a1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/tilesets/tf_jungle_a2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/tilesets/tf_jungle_a5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/tilesets/tf_jungle_b.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/buildings.py" beforeDir="false" afterPath="$PROJECT_DIR$/buildings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/defeat_screen.py" beforeDir="false" afterPath="$PROJECT_DIR$/defeat_screen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_game.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_game.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,36 +55,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.TEST.executor": "Run",
-    "Python.array_backed_grid_sprites.executor": "Run",
-    "Python.array_backed_grid_sprites_1.executor": "Run",
-    "Python.background_blending.executor": "Run",
-    "Python.main (1).executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.main_game (1).executor": "Run",
-    "Python.main_game.executor": "Run",
-    "Python.main_test.executor": "Run",
-    "Python.mao.executor": "Run",
-    "Python.map_window_test.executor": "Run",
-    "Python.minimap.executor": "Run",
-    "Python.sprite_move_animation.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.title.executor": "Run",
-    "Python.window.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/fidel/PycharmProjects/MonkeyTribeWars",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.TEST.executor&quot;: &quot;Run&quot;,
+    &quot;Python.array_backed_grid_sprites.executor&quot;: &quot;Run&quot;,
+    &quot;Python.array_backed_grid_sprites_1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.background_blending.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_game (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_game.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.mao.executor&quot;: &quot;Run&quot;,
+    &quot;Python.map_window_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.minimap.executor&quot;: &quot;Run&quot;,
+    &quot;Python.sprite_move_animation.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.title.executor&quot;: &quot;Run&quot;,
+    &quot;Python.window.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/fidel/PycharmProjects/MonkeyTribeWars&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "TEXT"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;TEXT&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\fidel\PycharmProjects\MonkeyTribeWars\assets\images\resources" />
@@ -290,7 +283,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731053667851</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Updated everything and kept your code. main_game is not fully commented.">
+      <option name="closed" value="true" />
+      <created>1732873801070</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1732873801070</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -335,6 +336,7 @@
     <MESSAGE value="Everything I have so far" />
     <MESSAGE value="Update" />
     <MESSAGE value="Tried adding a title page. Still need to fix camera movement and include more functions." />
-    <option name="LAST_COMMIT_MESSAGE" value="Tried adding a title page. Still need to fix camera movement and include more functions." />
+    <MESSAGE value="Updated everything and kept your code. main_game is not fully commented." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated everything and kept your code. main_game is not fully commented." />
   </component>
 </project>

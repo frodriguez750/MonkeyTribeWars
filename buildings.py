@@ -77,8 +77,8 @@ class Structure(arcade.Sprite):
         if self.team == "player" and self.spawn_timer >= PLAYER_SPAWN_COOLDOWN:
             # Spawn a player-aligned AI at the building's location
             new_ai = arcade.Sprite(
-                ":resources:images/animated_characters/male_adventurer/maleAdventurer_idle.png",
-                scale=0.5,
+                "assets/images/characters/monkey.png",
+                scale=0.15,
             )
             new_ai.center_x = self.center_x
             new_ai.center_y = self.center_y
@@ -88,7 +88,8 @@ class Structure(arcade.Sprite):
             print(f"AI Player spawned at ({self.center_x}, {self.center_y}) by {self.__class__.__name__}")
         elif self.team == "enemy" and self.spawn_timer >= ENEMY_SPAWN_COOLDOWN:
             # Spawn an enemy at the building's location
-            new_enemy = Enemy(":resources:images/animated_characters/zombie/zombie_idle.png", scaling=0.5)
+            new_enemy = Enemy("assets/images/characters/monkey.png", scaling=0.5)
+            new_enemy.color = arcade.color.RED
             new_enemy.center_x = self.center_x
             new_enemy.center_y = self.center_y
             new_enemy.row, new_enemy.col = int(self.center_y // tile_size), int(self.center_x // tile_size)
@@ -134,7 +135,7 @@ class Hut(Structure):
             team (str): The team the hut belongs to ('player' or 'enemy').
         """
         # Call the parent class with specific values for a hut
-        super().__init__('assets/images/resources/hut.png', start_x, start_y, cost={"WOOD": 5}, health=100, scale=0.25, team=team)
+        super().__init__('assets/images/resources/hut.png', start_x, start_y, cost={"WOOD": 5}, health=100, scale=0.15, team=team)
         self.team = team
 
 class Tower(Structure):
@@ -153,7 +154,7 @@ class Tower(Structure):
             team (str): The team the tower belongs to ('player' or 'enemy').
         """
         # Call the parent class with specific values for a tower
-        super().__init__('assets/images/resources/tower.png', start_x, start_y, cost={"WOOD": 75, "STONE": 25}, health=200, scale=0.25, team=team)
+        super().__init__('assets/images/resources/tower.png', start_x, start_y, cost={"WOOD": 75, "STONE": 25}, health=200, scale=0.15, team=team)
         self.team = team
 
 class BuildingManager:

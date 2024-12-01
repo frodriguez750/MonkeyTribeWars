@@ -1,6 +1,8 @@
 import arcade
 from arcade.gui import UIManager, UIButtonRow, UILabel
 
+from music import MusicManager
+
 
 class DefeatScreen(arcade.View):
     """
@@ -19,7 +21,7 @@ class DefeatScreen(arcade.View):
         print("Defeat screen enabled.")
 
         # Set the background color
-        arcade.set_background_color(arcade.color.BLACK)
+        arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
         print("Background color set.")
 
         # Create a vertical layout for UI elements
@@ -50,7 +52,9 @@ class DefeatScreen(arcade.View):
         def on_restart(event):
             print("Restart button clicked!")
             from main_game import GridGame  # Import the main game view
-            game_view = GridGame()
+            music_manager = MusicManager()  # Create a new instance of MusicManager
+            music_manager.load_background_music("assets/audio/background_music.wav")  # Load music
+            game_view = GridGame(music_manager=music_manager)  # Pass the MusicManager instance
             self.window.show_view(game_view)  # Restart the game
 
         # Add a "Quit" button

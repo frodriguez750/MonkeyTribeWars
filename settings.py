@@ -7,7 +7,7 @@ for controlling game options such as volume and returning to the main game.
 """
 
 import arcade
-from arcade.gui import UIManager, UIBoxLayout, UISlider, UIFlatButton, UITextWidget
+from arcade.gui import UIManager, UIBoxLayout, UISlider, UIFlatButton, UITextWidget, UILabel
 from arcade.gui.events import UIOnClickEvent
 from game_constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
@@ -45,25 +45,34 @@ class SettingsMenu(arcade.View):
         print("Background color set.")
 
         # Create box layout for settings
-        self.settings_list = UIBoxLayout(vertical=True, align="center", space_between=20,
+        settings_layout = UIBoxLayout(vertical=True, align="center", space_between=20,
                                          x=SCREEN_WIDTH / 2 - 150, y=SCREEN_HEIGHT / 2)
 
         self.volume_label = UITextWidget(text="Volume", align="center")
-        self.settings_list.add(self.volume_label)
+        settings_layout.add(self.volume_label)
 
         # Add volume slider
         self.volume_slider = UISlider(min_value=0, max_value=1, value=self.volume, width=300, align="center")
-        self.settings_list.add(self.volume_slider)
+        settings_layout.add(self.volume_slider)
+
+        # Add "how to play" button
+        how_to_play_button = UIFlatButton(text="How to Play")
+        settings_layout.add(how_to_play_button)
+
+        @how_to_play_button.event("on_click")
+        def on_how_to_play(event: UIOnClickEvent):
+            self.display_how_to_play()
 
         # Add a back button to return to the game
         back_button = UIFlatButton(text="Back")
-        self.settings_list.add(back_button)
-
-        self.manager.add(self.settings_list)
+        settings_layout.add(back_button)
 
         @back_button.event("on_click")
         def on_back(event: UIOnClickEvent):
             self.return_to_game()
+
+        self.manager.add(settings_layout)
+
 
     def on_hide_view(self):
         """
@@ -88,6 +97,46 @@ class SettingsMenu(arcade.View):
         """
         self.volume = self.volume_slider.value
         self.music_manager.set_volume(self.volume)
+
+    def display_how_to_play(self):
+        """
+        Display the "How to Play" instructions as an overlay.
+        """
+        # Clear previous UI components
+        self.manager.clear()
+
+        # Create a vertical layout for the instructions
+        how_to_play_layout = UIBoxLayout(vertical=True, align="center", space_between=10,
+                                         x=SCREEN_WIDTH / 2 - 150, y=SCREEN_HEIGHT / 2 - 150)
+
+        # Add instructions
+        instructions = [
+            "How to Play:",
+            "Spacebar: Attack",
+            "H: Build a Hut",
+            "T: Build a Tower",
+            "C: Create AI Player",
+            "U: Upgrade Player Speed",
+            "I: Upgrade Combat Strength",
+            "O: Upgrade Structure Health",
+            "P: Upgrade Resource Efficiency",
+            "Press Back to Return"
+        ]
+
+        for line in instructions:
+            label = UILabel(text=line, font_size=16, text_color=arcade.color.WHITE)
+            how_to_play_layout.add(label)
+
+        # Add a back button to return to settings
+        back_button = UIFlatButton(text="Back")
+        how_to_play_layout.add(back_button)
+
+        @back_button.event("on_click")
+        def on_back(event: UIOnClickEvent):
+            self.manager.clear()  # Clear the "How to Play" UI
+            self.on_show_view()  # Reload the main settings menu
+
+        self.manager.add(how_to_play_layout)
 
     def return_to_game(self):
         """
