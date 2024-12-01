@@ -12,3 +12,7 @@ GRID_WIDTH = 50
 
 # Height of the grid (number of tiles)
 GRID_HEIGHT = 50
+
+# Screen dimensions
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720

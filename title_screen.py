@@ -14,10 +14,11 @@ class TitleScreen(arcade.View):
     Represents the title screen of the game.
     """
 
-    def __init__(self):
+    def __init__(self, music_manager):
         super().__init__()
         # Initialize the UI Manager
         self.manager = UIManager()
+        self.music_manager = music_manager
 
     def on_show_view(self):
         """
@@ -46,14 +47,14 @@ class TitleScreen(arcade.View):
         @play_button.event("on_click")
         def on_play_click(event: UIOnClickEvent):
             from main_game import GridGame  # Import your game class
-            game_view = GridGame()
+            game_view = GridGame(self.music_manager)
             self.window.show_view(game_view)
 
         # Add the "SETTINGS" button
         settings_button = button_row.add_button(label="Settings")
         @settings_button.event("on_click")
         def on_settings_click(event: UIOnClickEvent):
-            settings_view = SettingsMenu(self)  # Pass this view as the parent
+            settings_view = SettingsMenu(self, self.music_manager)  # Pass this view as the parent
             self.window.show_view(settings_view)
 
         # Add the "EXIT" button
