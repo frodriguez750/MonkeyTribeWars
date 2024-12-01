@@ -7,8 +7,9 @@ for controlling game options such as volume and returning to the main game.
 """
 
 import arcade
-from arcade.gui import UIManager, UIButtonRow
+from arcade.gui import UIManager, UIBoxLayout, UISlider, UIFlatButton, UITextWidget
 from arcade.gui.events import UIOnClickEvent
+from game_constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
 class SettingsMenu(arcade.View):
@@ -17,7 +18,7 @@ class SettingsMenu(arcade.View):
     such as volume and return to the main game.
     """
 
-    def __init__(self, game_view):
+    def __init__(self, game_view, music_manager):
         """
         Initialize the settings menu.
 
@@ -27,7 +28,8 @@ class SettingsMenu(arcade.View):
         super().__init__()
         self.game_view = game_view  # Reference to the main game view
         self.manager = UIManager()
-        self.volume = 50  # Initial volume level (0-100)
+        self.music_manager = music_manager  # Reference to the music manager
+        self.volume = 0.5  # Initial volume level (0-100)
         print("SettingsMenu initialized.")
 
     def on_show_view(self):
@@ -42,39 +44,26 @@ class SettingsMenu(arcade.View):
         arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
         print("Background color set.")
 
-        # Create a button row to organize buttons vertically
-        button_row = UIButtonRow(vertical=True, align="center", space_between=20)
+        # Create box layout for settings
+        self.settings_list = UIBoxLayout(vertical=True, align="center", space_between=20,
+                                         x=SCREEN_WIDTH / 2 - 150, y=SCREEN_HEIGHT / 2)
 
-        # Add volume control buttons
-        volume_up_button = button_row.add_button(label="Volume Up")
-        print("Volume Up button added.")
+        self.volume_label = UITextWidget(text="Volume", align="center")
+        self.settings_list.add(self.volume_label)
 
-        @volume_up_button.event("on_click")
-        def on_volume_up(event: UIOnClickEvent):
-            self.volume_up()
-
-        volume_down_button = button_row.add_button(label="Volume Down")
-        print("Volume Down button added.")
-
-        @volume_down_button.event("on_click")
-        def on_volume_down(event: UIOnClickEvent):
-            self.volume_down()
+        # Add volume slider
+        self.volume_slider = UISlider(min_value=0, max_value=1, value=self.volume, width=300, align="center")
+        self.settings_list.add(self.volume_slider)
 
         # Add a back button to return to the game
-        back_button = button_row.add_button(label="Back to Game")
-        print("Back to Game button added.")
+        back_button = UIFlatButton(text="Back")
+        self.settings_list.add(back_button)
+
+        self.manager.add(self.settings_list)
 
         @back_button.event("on_click")
         def on_back(event: UIOnClickEvent):
             self.return_to_game()
-
-        # Add the button row to the UI Manager
-        self.manager.add(button_row)
-        print("Button row added to UIManager.")
-
-        # Center the button row on the screen
-        button_row.center_on_screen()
-        print("Button row centered on the screen.")
 
     def on_hide_view(self):
         """
@@ -91,27 +80,14 @@ class SettingsMenu(arcade.View):
         """
         self.clear()
         self.manager.draw()
-        print("SettingsMenu rendered.")
+        # print("SettingsMenu rendered.")
 
-    def volume_up(self):
+    def on_update(self, delta_time):
         """
-        Increase the game volume by 10%, up to a maximum of 100%.
+        Update settings values.
         """
-        if self.volume < 100:
-            self.volume += 10
-            print(f"Volume increased to {self.volume}%.")
-        else:
-            print("Volume is already at maximum!")
-
-    def volume_down(self):
-        """
-        Decrease the game volume by 10%, down to a minimum of 0%.
-        """
-        if self.volume > 0:
-            self.volume -= 10
-            print(f"Volume decreased to {self.volume}%.")
-        else:
-            print("Volume is already at minimum!")
+        self.volume = self.volume_slider.value
+        self.music_manager.set_volume(self.volume)
 
     def return_to_game(self):
         """
