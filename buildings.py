@@ -185,19 +185,20 @@ class BuildingManager:
         cost = structure.cost  # Get the cost to build the structure
         required_str = []  # List for required resource strings
         available_str = []  # List for available resource strings
+        insufficient = False
 
         # Check if the player has enough resources to build the structure
         for res, amt in cost.items():
-            if res in resources:
-                # If a resource is insufficient, log an error message and exit
-                if resources[res] < amt:
-                    for req, val in cost.items():
-                        required_str.append(req + " " + str(val))  # Add required resources to the list
-                        available_str.append(req + " " + str(resources.get(req, 0)))  # Add available resources to the list
+            if resources.get(res, 0) < amt:
+                insufficient = True
+                required_str.append(f"{res} {amt}")
+                available_str.append(f"{res} {resources.get(res, 0)}")
 
-                    print(f"Insufficient resources for {structure_type.__name__}. "
-                          f"Available: {', '.join(available_str)}. Needed: {', '.join(required_str)}")
-                    return False
+        # If a resource is insufficient, log an error message and exit
+        if insufficient:
+            print(f"Insufficient resources for {structure_type.__name__}. "
+                  f"Available: {', '.join(available_str)}. Needed: {', '.join(required_str)}")
+            return False
 
         # Deduct the required resources from the player's inventory
         for res, amt in cost.items():
