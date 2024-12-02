@@ -52,8 +52,9 @@ class GridGame(arcade.View):
         # Sprite lists
         self.player_sprite_list = arcade.SpriteList()
         self.enemy_sprite_list = arcade.SpriteList()
-        self.resource_sprite_list = arcade.SpriteList()
+        self.mraid_sprite_list = arcade.SpriteList()
         self.diamond_sprite_list = arcade.SpriteList()
+        self.drain_sprite_list = arcade.SpriteList()
         self.banana_sprite_list = arcade.SpriteList()
         self.ui_sprite_list = arcade.SpriteList()
 
@@ -79,6 +80,10 @@ class GridGame(arcade.View):
         settings_button = arcade.Sprite(":resources:onscreen_controls/shaded_light/gear.png",
                                         center_x=SCREEN_WIDTH-30, center_y=SCREEN_HEIGHT-30)
         self.ui_sprite_list.append(settings_button)
+
+        self.event_text = arcade.Text("", SCREEN_WIDTH // 2, SCREEN_HEIGHT - SCREEN_HEIGHT // 5,
+                                      anchor_x="center", anchor_y="center", font_size=26,
+                                      color=arcade.color.RED_ORANGE)
 
         # Resource manager
         self.resource_manager = ResourceManager()
@@ -123,8 +128,11 @@ class GridGame(arcade.View):
             diamond = Resource(type=ResourceType.DIAMOND)
             self.diamond_sprite_list.append(diamond)
 
-    def spawn_enemies(self, count):
+    def spawn_enemies(self, count, s_list=None):
         """Spawn enemies randomly on the grid."""
+        if s_list is None:
+            s_list = self.enemy_sprite_list
+
         for _ in range(count):
             row = random.randint(0, GRID_HEIGHT - 1)
             col = random.randint(0, GRID_WIDTH - 1)
@@ -133,7 +141,7 @@ class GridGame(arcade.View):
             enemy.row = row
             enemy.col = col
             enemy.center_x, enemy.center_y = pos_to_grid(row, col, TILE_SIZE)
-            self.enemy_sprite_list.append(enemy)
+            s_list.append(enemy)
 
     def on_draw(self):
         """Render the screen."""
@@ -147,10 +155,11 @@ class GridGame(arcade.View):
             arcade.draw_line(col * TILE_SIZE, 0, col * TILE_SIZE, GRID_HEIGHT * TILE_SIZE, arcade.color.LIGHT_GRAY)
 
         # Draw sprites
-        self.resource_sprite_list.draw()
         self.diamond_sprite_list.draw()
+        self.drain_sprite_list.draw()
         self.player_sprite_list.draw()
         self.enemy_sprite_list.draw()
+        self.mraid_sprite_list.draw()
         self.banana_sprite_list.draw()
         self.ai_players.draw()
         self.resource_manager.resource_sprite_list.draw()
@@ -169,6 +178,10 @@ class GridGame(arcade.View):
         )
 
         self.ui_sprite_list.draw()
+
+        if self.active_event:
+            self.event_text.text = f"{self.active_event} IN PROGRESS!"
+            self.event_text.draw()
 
         if self.flash_duration > 0:
             arcade.draw_lbwh_rectangle_filled(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.flash_color)
@@ -218,12 +231,16 @@ class GridGame(arcade.View):
         # Apply active upgrades
         self.upgrade_manager.apply_upgrades()
 
+        enemy_sprites = arcade.SpriteList()
+        enemy_sprites.extend(self.enemy_sprite_list)
+        enemy_sprites.extend(self.mraid_sprite_list)
+
         # Update banana projectiles
         self.banana_sprite_list.update()
         for banana in self.banana_sprite_list:
             banana.angle += 10
             banana.life += delta_time
-            enemies_hit = arcade.check_for_collision_with_list(banana, self.enemy_sprite_list)
+            enemies_hit = arcade.check_for_collision_with_list(banana, enemy_sprites)
             for enemy in enemies_hit:
                 enemy.remove_from_sprite_lists()
                 banana.remove_from_sprite_lists()
@@ -240,7 +257,7 @@ class GridGame(arcade.View):
         self.enemy_move_timer += delta_time
         if self.enemy_move_timer >= ENEMY_MOVE_DELAY:
             self.enemy_move_timer = 0
-            for enemy in self.enemy_sprite_list:
+            for enemy in enemy_sprites:
                 if enemy.alive:
                     dx = random.choice([-1, 0, 1])
                     dy = random.choice([-1, 0, 1])
@@ -263,20 +280,24 @@ class GridGame(arcade.View):
                             x, y = enemy.row, enemy.col
                             if self.structure_manager.place_structure(Hut, int(x), int(y), enemy.inventory, team="enemy"):
                                 print(f"Enemy built a Hut at ({x}, {y}).")
-        
+
         if self.player.itime > PLAYER_INV:
             self.player.hit = False
             self.player.itime = 0
 
         if not self.player.hit:
-            for enemy in self.enemy_sprite_list:
+            for enemy in enemy_sprites:
                 if arcade.check_for_collision(enemy, self.player):
                     self.player_take_damage(ENEMY_DAMAGE)
         else:
             self.player.itime += delta_time
 
         # Player collects diamonds
-        diamonds_collected = arcade.check_for_collision_with_list(self.player, self.diamond_sprite_list)
+        diamond_list = arcade.SpriteList()
+        diamond_list.extend(self.diamond_sprite_list)
+        diamond_list.extend(self.drain_sprite_list)
+        diamonds_collected = arcade.check_for_collision_with_list(self.player,
+                                                                  diamond_list)
         if diamonds_collected:
             for diamond in diamonds_collected:
                 diamond.remove_from_sprite_lists()
@@ -295,6 +316,7 @@ class GridGame(arcade.View):
                 self.inventory["WOOD"] += 1
             elif collected_type == ResourceType.STONE:
                 self.inventory["STONE"] += 1
+            self.resource_manager.spawn_resource()
 
         # AI Player Movement and Actions
         self.ai_move_timer += delta_time
@@ -307,7 +329,7 @@ class GridGame(arcade.View):
                 self.move_sprite(ai, dx, dy)
 
                 # AI attacks nearby enemies
-                for enemy in self.enemy_sprite_list:
+                for enemy in enemy_sprites:
                     if abs(ai.row - enemy.row) <= 1 and abs(ai.col - enemy.col) <= 1:
                         enemy.remove_from_sprite_lists()
                         print(f"AI player at ({ai.row}, {ai.col}) attacked and defeated an enemy.")
@@ -429,6 +451,12 @@ class GridGame(arcade.View):
             else:
                 print("Not enough diamonds for resource efficiency upgrade.")
 
+        # if key == arcade.key.Z:  # Manually start an event (for debugging)
+        #     self.time_since_last_event = 35
+        #     self.active_event = "Resource Shortage"
+        #     self.event_timer = 0  # Reset event timer
+        #     self.time_since_last_event = 0  # Reset cooldown
+
     def on_mouse_press(self, x, y, button, modifiers):
         for ui in self.ui_sprite_list:
             if ui.collides_with_point((x, y)):
@@ -461,9 +489,12 @@ class GridGame(arcade.View):
         self.flash_duration = FLASH_DURATION
         self.player.hit = True
         self.flash_color = (255, 0, 0, 32)
-    
+
     def player_heal(self, health):
-        self.player_health = max(self.player_health + health, PLAYER_HEALTH)
+        if self.player_health > PLAYER_HEALTH:
+            self.player_health = PLAYER_HEALTH
+        else:
+            self.player_health = self.player_health + health
         self.flash_duration = FLASH_DURATION
         self.flash_color = (0, 255, 0, 32)
 
@@ -497,12 +528,12 @@ class GridGame(arcade.View):
                 structure.health -= 20
                 if structure.health <= 0:
                     self.structure_manager.structures.remove(structure)
-                    print(f"A structure was destroyed by the meteor shower!")
+                    print("A structure was destroyed by the meteor shower!")
 
             # Damage players and enemies in random spots
             for sprite_list in [self.player_sprite_list, self.enemy_sprite_list]:
                 for sprite in sprite_list:
-                    if random.random() < 0.1:  # 10% chance to be hit
+                    if random.random() < 0.01:  # 1% chance to be hit
                         if type(sprite) is GridSprite:
                             self.player_take_damage(10)
                             print("Player was hit by a meteor!")
@@ -524,9 +555,11 @@ class GridGame(arcade.View):
                 enemy.speed = max(enemy.speed - 1, 1)  # Ensure speed doesn't go below 1
                 enemy.attack_power = max(enemy.attack_power - 5, 1)
             print("Monkey Raid ended!")
+            self.mraid_sprite_list.clear()
             self.active_event = None
         else:
             # Increase enemy speed and attack power during the raid
+            self.spawn_enemies(1, self.mraid_sprite_list)
             for enemy in self.enemy_sprite_list:
                 enemy.speed += 1
                 enemy.attack_power += 5
@@ -540,10 +573,11 @@ class GridGame(arcade.View):
         if self.event_timer >= shortage_duration:
             print("Resource shortage ended!")
             self.active_event = None
+            self.spawn_resources(RESOURCE_COUNT)
         else:
             # Temporarily reduce resource availability
-            for resource in self.resource_manager.resource_sprite_list:
-                resource.type = random.choice([ResourceType.WOOD, ResourceType.STONE])  # Reduce variety
+            self.resource_manager.resource_sprite_list.clear()
+            self.diamond_sprite_list.clear()
             print("Resource shortage in progress!")
 
     def apply_diamond_rain_effects(self):
@@ -554,11 +588,12 @@ class GridGame(arcade.View):
         if self.event_timer >= rain_duration:
             print("Diamond Rain ended!")
             self.active_event = None
+            self.drain_sprite_list.clear()
         else:
             # Spawn extra diamonds randomly on the map
             for _ in range(5):  # Spawn 5 diamonds per tick
                 diamond = Resource(ResourceType.DIAMOND)
-                self.diamond_sprite_list.append(diamond)
+                self.drain_sprite_list.append(diamond)
                 print(f"Diamond spawned at ({diamond.row}, {diamond.col})")
 
     def trigger_random_event(self):
@@ -573,9 +608,9 @@ class GridGame(arcade.View):
             self.time_since_last_event = 0  # Reset cooldown
             print(f"Random event triggered: {self.active_event}")
 
+
 if __name__ == "__main__":
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     title_screen = TitleScreen(MusicManager())
     window.show_view(title_screen)  # Start with the title screen
     arcade.run()
-
