@@ -28,6 +28,8 @@ Ensure you have the following installed on your system:
 3. Install the required dependencies:
    ```bash
    pip install arcade==3.0.0.dev37 numpy==2.1.3
+   or
+   pip install -r requirements.txt
 4. Run the game:
    ```bash
    python main_game.py
