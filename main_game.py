@@ -263,23 +263,23 @@ class GridGame(arcade.View):
                     dy = random.choice([-1, 0, 1])
                     self.move_sprite(enemy, dx, dy)
 
-                    # Check collision with player
-                    if arcade.check_for_collision(enemy, self.player):
-                        # Enemy collects resources (but not FOOD or DIAMOND)
-                        resources_collected = arcade.check_for_collision_with_list(
-                            enemy, self.resource_manager.resource_sprite_list
-                        )
-                        for resource in resources_collected:
-                            collected_type = resource.collected()
-                            if collected_type in ["WOOD", "STONE"]:
-                                enemy.inventory[collected_type] += 1
-                                print(f"Enemy collected {collected_type}.")
+                    # Enemy collects resources (but not FOOD or DIAMOND)
+                    resources_collected = arcade.check_for_collision_with_list(
+                        enemy, self.resource_manager.resource_sprite_list
+                    )
 
-                        # Enemy builds structures if enough resources are available
-                        if enemy.inventory["WOOD"] >= 10:  # Example: Build Hut if enough wood
-                            x, y = enemy.row, enemy.col
-                            if self.structure_manager.place_structure(Hut, int(x), int(y), enemy.inventory, team="enemy"):
-                                print(f"Enemy built a Hut at ({x}, {y}).")
+                    for resource in resources_collected:
+                        collected_type = resource.collected().name
+                        self.resource_manager.spawn_resource()
+                        if collected_type in ["WOOD", "STONE"]:
+                            enemy.inventory[collected_type] += 1
+                            print(f"Enemy collected {collected_type}.")
+
+                    # Enemy builds structures if enough resources are available
+                    if enemy.inventory["WOOD"] >= 10:  # Example: Build Hut if enough wood
+                        x, y = pos_to_grid(enemy.row, enemy.col)
+                        if self.structure_manager.place_structure(Hut, x, y, enemy.inventory, team="enemy"):
+                            print(f"Enemy built a Hut at ({enemy.row}, {enemy.col}).")
 
         if self.player.itime > PLAYER_INV:
             self.player.hit = False
@@ -451,11 +451,11 @@ class GridGame(arcade.View):
             else:
                 print("Not enough diamonds for resource efficiency upgrade.")
 
-        # if key == arcade.key.Z:  # Manually start an event (for debugging)
-        #     self.time_since_last_event = 35
-        #     self.active_event = "Resource Shortage"
-        #     self.event_timer = 0  # Reset event timer
-        #     self.time_since_last_event = 0  # Reset cooldown
+        if key == arcade.key.Z:  # Manually start an event (for debugging)
+            self.time_since_last_event = 35
+            self.active_event = "Meteor Shower"
+            self.event_timer = 0  # Reset event timer
+            self.time_since_last_event = 0  # Reset cooldown
 
     def on_mouse_press(self, x, y, button, modifiers):
         for ui in self.ui_sprite_list:
