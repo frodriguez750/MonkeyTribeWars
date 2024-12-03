@@ -46,7 +46,7 @@ class MusicManager:
             loop (bool): Whether the music should loop.
         """
         if self.background_music:
-            self.player = self.background_music.play(self.volume)
+            self.player = self.background_music.play(self.volume, loop=True)
 
     def stop_background_music(self):
         """

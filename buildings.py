@@ -8,12 +8,6 @@ import arcade
 from enemies import Enemy
 from game_constants import TILE_SIZE
 
-# Costs required to build different types of structures
-STRUCTURE_COSTS = {
-    "hut": {"WOOD": 10},  # A hut costs 10 units of wood
-    "tower": {"WOOD": 10, "STONE": 10}  # A tower costs 10 units of wood and stone each
-}
-
 # Constants
 BUILDING_ATTACK_DAMAGE = 20  # Damage dealt by buildings
 BUILDING_ATTACK_RANGE = 2  # Range of attack (twice that of players/enemies)
@@ -154,7 +148,7 @@ class Tower(Structure):
             team (str): The team the tower belongs to ('player' or 'enemy').
         """
         # Call the parent class with specific values for a tower
-        super().__init__('assets/images/resources/tower.png', start_x, start_y, cost={"WOOD": 75, "STONE": 25}, health=200, scale=0.15, team=team)
+        super().__init__('assets/images/resources/tower.png', start_x, start_y, cost={"WOOD": 5, "STONE": 5}, health=200, scale=0.15, team=team)
         self.team = team
 
 class BuildingManager:
