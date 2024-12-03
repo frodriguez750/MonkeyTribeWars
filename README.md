@@ -30,7 +30,7 @@ Ensure you have the following installed on your system:
    pip install arcade==3.0.0.dev37 numpy==2.1.3
 4. Run the game:
    ```bash
-   python main.py
+   python main_game.py
 ## Gameplay Instructions
 1. Start the Game: Run the program to enter the main game screen.
 2. Navigate the Map: Use arrow keys to move your monkey across the grid.
